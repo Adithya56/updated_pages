@@ -96,6 +96,9 @@ body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     }    
    
     header {
@@ -211,13 +214,28 @@ nav ul li:not(:last-child) {
 		    transform: rotate(360deg);
 		  }
 		}
+		   main {
+		    flex: 1;
+		  }
+		
+		  footer {
+		    background-color: #047bd5;
+		    color: #fff;
+		    padding: 10px;
+		    text-align: center;
+		    position: fixed;
+		    bottom: 0;
+		    left: 0;
+		    width: 100%;
+		  }
+		  
    </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
   <script>
   function showSpinner() {
 	  var spinnerContainer = document.getElementById('spinner-container');
@@ -279,14 +297,15 @@ nav ul li:not(:last-child) {
           method: 'GET',
           data: { page: currentPage }, // Send the current page as a parameter
           success: function(response) {
+            // Hide the loading indicator or spinner here if shown
+        	  hideSpinner();
             // Append the fetched products to the existing product list on the page
             $('#productsdisplay').append(response);
 
             // Increment the current page
             currentPage++;
 
-            // Hide the loading indicator or spinner here if shown
-            hideSpinner();
+            
           },
           error: function(xhr, status, error) {
             console.log('AJAX Error: ' + error);
@@ -421,14 +440,14 @@ nav ul li:not(:last-child) {
       }
 
       function showCart() {
-    	  showSpinner();
+    	  /* showSpinner(); */
         $.ajax({
           url: "cartDisplay",
           method: 'GET',
           success: function(response) {
         	 // window.location.href = "cart.jsp";
         	  $('#payment').html(response); // Set the response HTML as the inner HTML of the cart items element
-        	  hideSpinner();
+        	  /* hideSpinner(); */
           },
           error: function(xhr, status, error) {
             console.log('AJAX Error: ' + error);
@@ -437,7 +456,7 @@ nav ul li:not(:last-child) {
       }
 
       function showWishlist() {
-    	    showSpinner();
+    	   /*  showSpinner(); */
     	    <% if (session.getAttribute("customer")==null) { %>
     	        window.location.href = "signIn";
     	    <% }
@@ -450,7 +469,7 @@ nav ul li:not(:last-child) {
     	        success: function(response) {
     	            console.log("response of wishlist " + response);
     	            $('#payment').html(response); // Set the response HTML as the inner HTML of the cart items element
-    	            hideSpinner();
+    	           /*  hideSpinner(); */
     	        },
     	        error: function(xhr, status, error) {
     	            console.log('AJAX Error: ' + error);
@@ -527,12 +546,7 @@ nav ul li:not(:last-child) {
       $('#Wishlist-button').click(function() {
         showWishlist();
       });
-      $('#searchbtn').click(function() {
-          event.preventDefault();
-
-         search();
-        });
-
+      
       var slides = $('.slide');
       var currentSlide = 0;
 
@@ -558,6 +572,7 @@ nav ul li:not(:last-child) {
     });
   </script>
   <script>
+  $(document).ready(function() {
     function showProductDetails(productId) {
     	console.log("showproduct");   
     	$.ajax({
@@ -602,21 +617,66 @@ nav ul li:not(:last-child) {
             }
         });
     }
-    function search() {
-    	  var searchTerm = document.getElementById("search").value;
-    	  $.ajax({
-    	    type: "GET",
-    	    url: "searchProducts", // Update the URL to the correct endpoint
-    	    data: { search: searchTerm },
-    	    success: function(response) {
-    	      $('#maindiv').html(response);
-    	    },
-    	    error: function() {
-    	      alert("Error occurred while filtering product details.");
-    	    }
-    	  });
-    	}
-    
+    $('#searchbtn').on('click', function(event) {
+  	  event.preventDefault();
+  	  search();
+  	});
+
+  	$('#search').keypress(function(event) {
+  	  if (event.which === 13) {
+  	    event.preventDefault();
+  	    search();
+  	  }
+  	});
+
+  	$('#search').on('input', function() {
+  	  var searchTerm = $(this).val();
+  	  $.ajax({
+  	    type: "GET",
+  	    url: 'SearchSuggestions',
+  	    data: { search: searchTerm },
+  	    success: function(response) {
+  	      var suggestions = $('#suggestions');
+  	      suggestions.empty(); // Clear existing suggestions
+
+  	      // Iterate over the response and add each suggestion as an <option> element
+  	      response.forEach(function(suggestion) {
+  	        suggestions.append('<option value="' + suggestion + '">' + suggestion + '</option>');
+  	      });
+  	    },
+  	    error: function() {
+  	      alert("Error occurred while retrieving search suggestions.");
+  	    }
+  	  });
+  	});
+  });
+  function search() {
+	  var searchTerm = document.getElementById("search").value;
+	  $.ajax({
+	    type: "GET",
+	    url: 'searchProducts',
+	    data: { search: searchTerm },
+	    success: function(response) {
+	      $('#maindiv').html(response);
+	    },
+	    error: function() {
+	      alert("Error occurred while filtering product details.");
+	    },
+	    complete: function() {
+	      // Clear the search input after the search is completed
+	      $('#search').val('');
+	    }
+	  });
+	}
+
+	
+
+	
+  /* $('#search').change(function() {
+  search();
+ }); */
+ 
+
 </script>
 </head>
 <body >
@@ -624,7 +684,7 @@ nav ul li:not(:last-child) {
 <div id="spinner-container">
   <div id="spinner"></div>
 </div>
-  <h1><i class="fas fa-shopping-cart"></i> SLAM</h1>
+  <h1 ><i class="fas fa-shopping-cart"></i> SLAM</h1>
   <nav>
     <ul>
       <li ><a href="loggedIn" style="font-weight: bold;">Home</a></li>
@@ -677,13 +737,9 @@ nav ul li:not(:last-child) {
 </header>
  <div id="payment"> 
   <div class="search-bar">
-    <form>
-      <input type="search" placeholder="Search..." id="search">
-      <button type="submit" id="searchbtn">Search</button>
-    </form>
-    <br>
-    
-    
+    <input type="search" placeholder="Search..." id="search" list="suggestions">
+	<datalist id="suggestions"></datalist>
+	<button type="submit" id="searchbtn">Search</button>  
   </div>
   <main>
   <div id="maindiv">
@@ -710,13 +766,13 @@ nav ul li:not(:last-child) {
         <div id="transitionSlideShowPage">
                      <div class="slideshow-container">
                          <div class="slide active">
-                             <img  src="https://static.digit.in/default/848e74e131ed5b8172357de25c0afb9bf691029c.jpeg?tr=w-1200" />
+                             <img  src="https://www.stuff.tv/wp-content/uploads/sites/2/2021/04/Stuff-Best-Laptop-Lead.png"  onclick="loadProductsByCategory(1)"/>
                          </div>
                          <div class="slide">
-                             <img src="https://mobirise.com/extensions/commercem4/assets/images/3.jpg" alt="Slide 2">
+                             <img src="https://static1.makeuseofimages.com/wordpress/wp-content/uploads/2022/05/Apple-Earbuds-and-Sony-headphones-side-by-side.jpg" alt="Slide 2" onclick="loadProductsByCategory(3)">
                         </div>
                         <div class="slide">
-                               <img src="https://t4.ftcdn.net/jpg/03/38/88/59/240_F_338885943_qQRG84nyD1CcTdXuVD4UbzMz1xBGWjBC.jpg" alt="Slide 3">
+                               <img src="https://chamberhill.com/wp-content/uploads/2021/10/pexels-cottonbro-3945683-scaled.jpg" alt="Slide 3" onclick="loadProductsByCategory(5)">
                         </div>
                         <div class="slide">
                                 <img src="https://assets.thehansindia.com/h-upload/2022/04/30/1600x960_1289668-mobiles-11.jpg" onclick="loadProductsByCategory(2)" alt="Slide 4">
@@ -731,7 +787,7 @@ nav ul li:not(:last-child) {
     </main>
     
   <footer>
-    <!-- <p>&copy; 2023 SLAM Store. All rights reserved.</p> -->
+    <p>&copy; 2023 SLAM Store. All rights reserved.</p> 
   </footer>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -768,13 +824,17 @@ nav ul li:not(:last-child) {
  	      success: function(response) {
  	    	  console.log("response of category based prod "+response);
  	      
- 	        $('#prod').html(response); // Set the response HTML as the inner HTML of the select element
+ 	        $('#maindiv').html(response); // Set the response HTML as the inner HTML of the select element
  	        hideSpinner(); 
  	      },
  	      error: function(xhr, status, error) {
  	        console.log('AJAX Error: ' + error);
  	      }
  	    });}
+  $('#searchbtn').on('click', function(event) {
+	  event.preventDefault();
+	  search();
+	});
 
 </script>
 
