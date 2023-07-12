@@ -228,7 +228,9 @@ nav ul li:not(:last-child) {
 		    left: 0;
 		    width: 100%;
 		  }
-		  
+		  h1{
+		  font-family: "ColfaxAI,sans-serif";
+		  }
    </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
@@ -657,7 +659,7 @@ nav ul li:not(:last-child) {
 	    url: 'searchProducts',
 	    data: { search: searchTerm },
 	    success: function(response) {
-	      $('#maindiv').html(response);
+	      $('#prod').html(response);
 	    },
 	    error: function() {
 	      alert("Error occurred while filtering product details.");
@@ -684,7 +686,7 @@ nav ul li:not(:last-child) {
 <div id="spinner-container">
   <div id="spinner"></div>
 </div>
-  <h1 ><i class="fas fa-shopping-cart"></i> SLAM</h1>
+  <h1><i class="fas fa-shopping-cart"></i> SLAM</h1>
   <nav>
     <ul>
       <li ><a href="loggedIn" style="font-weight: bold;">Home</a></li>
@@ -736,11 +738,18 @@ nav ul li:not(:last-child) {
   </nav>
 </header>
  <div id="payment"> 
-  <div class="search-bar">
-    <input type="search" placeholder="Search..." id="search" list="suggestions">
-	<datalist id="suggestions"></datalist>
-	<button type="submit" id="searchbtn">Search</button>  
-  </div>
+ <br>
+	<div class="d-flex justify-content-center serachbar">
+	  <div class="input-group mb-3" style="max-width: 500px;">
+	    <input type="search" class="form-control bg-white" placeholder="Search products here.." id="search" list="suggestions">
+	    <datalist id="suggestions"></datalist>
+	    <div class="input-group-append">
+	      <button class="btn btn-primary" type="button" id="searchbtn">Search</button>
+	    </div>
+	  </div>
+	</div>
+</div>
+
   <main>
   <div id="maindiv">
   <div class="text-center">
